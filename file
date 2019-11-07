@@ -1,0 +1,167 @@
+#include <iostream>
+#include <random>
+#include <string>
+
+
+void start();
+int menu();
+
+
+long long Mersenne(long long min, long long max) 
+{
+	std::random_device rd;
+	std::mt19937_64 mersenne(rd());//Инициализация Вихря Мерсенна случайным стартовым числом
+	
+	unsigned long long g{ 18446744073709551615 };
+	static const long double fraction = 1.0 / (static_cast<long double>(g + 1.0));
+	
+	return static_cast<long long>(mersenne() * fraction * (max - min + 1) + min);
+}
+
+long long getValue(std::string extremum) 
+{
+	while (true) {
+		std::cout << "\n\tPlease, enter the " << extremum << " number: ";
+		long long value;
+		std::cin >> value;
+
+		//Выполняем проверку вводимых значений
+		if (std::cin.fail())
+		{
+			std::cin.clear();
+			std::cin.ignore(32767, '\n');
+			std::cout << "\n\t\t\t\tOops, something went wrong.\n";
+		}
+		else
+		{
+			std::cin.ignore(32767, '\n');
+			return value;
+		}
+	}
+}
+
+bool check(long long randomValue, long long attempts)
+{
+	long long number;
+	for (int count = 1; count <= attempts; ++count)
+	{
+		//Просим угадать число согласно заданному диапазону значений
+		std::cout << "\n\t\t\t\t\tGuess #"<< count;
+		number = getValue("some suitable");
+		if (number == randomValue)
+		{	//Если число угадано, завершаем процесс и переходим в меню
+			std::cout << "\n\t\t\t\tAEE!\tYou guessed the number! YOU win! \n ";
+			return true;
+		}
+		else if (number > randomValue)
+			std::cout << "\n\tYour number is bigger. \n";
+		else
+			std::cout << "\n\tYour number is smaller. \n";
+	}
+	return false;
+}
+
+void NewGame()
+{
+	//Получаем от пользователя диапазон угадываемых значений
+	long long min(0), max(1);
+	do {
+		if (min > max)
+			std::cout << "\n\t\t\t\tOoops, that input is invalid. Try again!\n ";
+		min = getValue("minimum");
+		max = getValue("maximum");
+	} while (min > max);
+
+	//Задаём количество попыток
+	long long attempts = getValue("attempts");
+
+	//Устанавливаем рандомно число, которое мы хотим угадать
+	long long randomValue = Mersenne(min, max);
+
+
+	//Сначала узнаем от пользователя числа и параллельно будем отвечать, близко ли оно к искомому
+	bool finish = check(randomValue, attempts);
+
+
+	//Выдаём сообщение о проигрыше, если спустя все попытки игрок так и не угадал число.
+	if (finish == false)
+	{
+		std::cout << "\n\n\n\t\t\t\t\tSorry. You lost.";
+		std::cout << "\n\t\t\t\tThe correct number was " << randomValue;
+	}
+
+	//Выбираем дальнейшие действия
+	start();
+}
+
+void game(int choice)
+{
+	switch (choice) {
+	case 1:
+	{
+		NewGame();
+		break;
+	}
+	case 2:
+		break;
+	default:
+		std::cout << "\n\t\t\t\tOops, something went wrong.";
+	}
+} 
+
+int menu()
+{
+	while (true)
+	{
+		std::cout << "\n\n\t\t\t\tNew game - 1\t\tLeave the game - 2\n\t\t\t\t\t\t";//На случай, если буду делать по сложностям ---/ Setting - 3(complexity - (default) - easily)";
+		int choice;
+		std::cin >> choice;
+
+
+		if (std::cin.fail())
+		{
+			std::cin.clear();
+			std::cin.ignore(32767, '\n');
+			std::cout << "\n\t\t\t\tOops, something went wrong.";
+		}
+		else if ((choice == 1) || (choice == 2))
+			return choice;
+		else
+			std::cout << "\t\t\t\tThere is not that number! \t Try again. \n";
+	}
+}
+void start()
+{
+	//Начинаем игру!!!
+	int choice = menu();//Выбираем опцию
+	game(choice);
+}
+
+
+/*std::string Complexity()
+{
+	while (true) {
+		std::cout << "Choose the difficulty of the game: easy, medium, complex, custom";
+		std::string choice;
+		std::cin >> choice;
+
+		std::cin.ignore(32767, '\n');
+
+		if ((choice == "easy") || (choice == "medium") || ( choice == "complex" )||(choice == "custom"))
+		{
+			return choice;
+		}
+		else if (std::cin.fail())
+			std::cin.clear();
+	}
+}//На случай, если буду делать по сложностям
+*/
+
+
+
+int main()
+{
+	std::cout << "\t\t...\t...\t...\t...\t...HI-LO...\t...\t...\t...\t...";
+	start();
+	return 0;
+}
